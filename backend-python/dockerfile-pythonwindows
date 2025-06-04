@@ -1,0 +1,46 @@
+FROM mcr.microsoft.com/windows/servercore:ltsc2019
+#não dá
+#FROM mcr.microsoft.com/windows/servercore:ltsc2022
+ENV PYTHON_VERSION 3.10.0
+
+
+# Download the Python installer
+#funciona todos, mas nao testei
+#ADD https://www.python.org/ftp/python/3.7.0/python-3.7.0.exe C:/python-installer.exe
+#ADD https://www.python.org/ftp/python/3.8.0/python-3.8.0.exe C:/python-installer.exe
+#ADD https://www.python.org/ftp/python/3.9.0/python-3.9.0.exe C:/python-installer.exe
+ADD https://www.python.org/ftp/python/${PYTHON_VERSION}/python-${PYTHON_VERSION}.exe C:/python-installer.exe
+#ADD https://www.python.org/ftp/python/3.11.0/python-3.11.0.exe C:/python-installer.exe
+
+
+# Install Python
+RUN C:/python-installer.exe /quiet InstallAllUsers=1 PrependPath=1
+
+#Set PATH environment variable: In Windows, Python is typically not added to the PATH by default during installation.
+# Add it manually to ensure Python can be executed from any directory.
+RUN setx /M PATH "%PATH%;C:\Python310;C:\Python310\Scripts"
+
+# Install pip
+RUN python -m ensurepip --upgrade
+
+# Copy the requirements.txt file into the container
+COPY requirements.txt .
+
+# Install the project dependencies
+RUN python -m pip install -r requirements.txt
+
+#Cleanup: After the installation, remove the temporary installer file.
+#RUN del C:/python-installer.exe
+RUN powershell -Command "Remove-Item -Path 'c:\python-installer.exe'"
+
+
+# Set the working directory and copy your Python script
+WORKDIR /files
+COPY app.py .
+
+# Set the entrypoint (replace 'app.py' with your script's name if necessary)
+#ENTRYPOINT ["python", "app.py"]
+
+
+#docker build -t dockerfilewin:1 -f dockerfilewin .
+#docker container run  -it dockerfilewin:1 commandToRun

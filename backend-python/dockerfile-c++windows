@@ -1,0 +1,56 @@
+# Use the official Microsoft Visual C++ Build Tools image as the base image
+#FROM mcr.microsoft.com/windows/servercore:ltsc2019
+FROM mcr.microsoft.com/dotnet/framework/runtime:4.8-windowsservercore-ltsc2016
+
+# Download and install Microsoft Visual C++ Build Tools
+#ADD https://aka.ms/vs/16/release/vc_redist.x64.exe C:/vc_redist.x64.exe
+#RUN C:\vc_redist.x64.exe /install /quiet /norestart
+
+# Set environment variables for MSBuild
+#ENV MSBUILD_PATH="C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin"
+#ENV PATH="%PATH%;%MSBUILD_PATH%"
+
+# Download and install Chocolatey package manager
+RUN powershell -Command "Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))"
+
+ENV MAKE_PATH="C:\ProgramData\chocolatey\bin"
+ENV PATH="%PATH%;%MAKE_PATH%"
+RUN choco install make gnuwin32-make -y
+RUN choco install mingw -y
+
+ENV GPP_PATH="C:\tools\mingw64\bin"
+ENV PATH="%PATH%;%GPP_PATH%"
+
+
+# Download MinGW from SourceForge
+#ADD https://nchc.dl.sourceforge.net/project/mingw-w64/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/8.1.0/threads-posix/seh/x86_64-8.1.0-release-posix-seh-rt_v6-rev0.7z C:/mingw-w64.7z
+
+# Install 7-Zip to extract the MinGW archive
+#ADD https://www.7-zip.org/a/7z1900-x64.msi C:/7z.msi
+#RUN msiexec /i C:\7z.msi /quiet
+    #&& del C:\7z.msi
+
+# Extract MinGW
+#RUN C:\Program Files\7-Zip\7z.exe x C:\mingw-w64.7z -oC:\mingw-w64
+    #del C:\mingw-w64.7z
+
+# Set environment variables for MinGW
+#ENV MINGW_PATH="C:\mingw-w64\mingw64\bin"
+#ENV PATH="%PATH%;%MINGW_PATH%"
+
+
+
+
+
+# Set the working directory inside the container
+WORKDIR /files
+
+
+# Verify Java installation
+#RUN java -version
+
+#docker container run -it java:latest
+#docker container run -it e25:1 python ./run_tests_robustness.py
+
+
+

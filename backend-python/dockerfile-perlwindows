@@ -1,0 +1,24 @@
+# Use the Windows Server Core image as the base image
+FROM mcr.microsoft.com/windows/servercore:ltsc2019
+
+# Set up environment variables
+ENV PERL_VERSION 5.32.1.1
+ENV PERL_PATH C:/Perl64
+
+
+# Download and extract Strawberry Perl
+#https://strawberryperl.com/releases.html
+ADD https://strawberryperl.com/download/${PERL_VERSION}/strawberry-perl-${PERL_VERSION}-64bit.zip C:/perl.zip
+RUN powershell -Command "Expand-Archive -Path 'C:\perl.zip' -DestinationPath 'C:\Perl64'"
+RUN powershell -Command "Remove-Item -Path 'c:\perl.zip'"
+
+
+
+# Add Perl to the PATH
+RUN setx /M PATH "%PATH%;%PERL_PATH%\perl\bin"
+
+# Set the working directory inside the container
+WORKDIR /files
+
+#docker container run -it perl:latest
+#docker container run -it e25:1 python ./run_tests_robustness.py

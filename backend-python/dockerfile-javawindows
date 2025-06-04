@@ -1,0 +1,51 @@
+# Use the official Windows Server Core image as the base image
+FROM mcr.microsoft.com/windows/servercore:ltsc2019
+
+# Download and install Java JDK (AdoptOpenJDK 17, HotSpot JVM)
+ENV JAVA_VERSION 17
+#It is necessary to change
+ENV PLUSVALUE 35
+
+
+# Download and extract JDK
+#ADD https://download.oracle.com/java/${JAVA_VERSION}/archive/jdk-${JAVA_VERSION}_windows-x64_bin.zip C:/jdk.zip
+ENV FILE_URL "https://download.java.net/openjdk/jdk${JAVA_VERSION}/ri/openjdk-${JAVA_VERSION}+${PLUSVALUE}_windows-x64_bin.zip"
+ADD ${FILE_URL} C:/jdk.zip
+#unzip
+RUN powershell -Command "expand-archive -Path 'c:\jdk.zip' -DestinationPath 'c:\jdk'"
+RUN powershell -Command "Remove-Item -Path 'c:\jdk.zip'"
+
+# Set Java home environment variable
+RUN setx -m JAVA_HOME "C:\jdk\jdk-%JAVA_VERSION%"
+RUN setx -m PATH "%PATH%;%JAVA_HOME%\bin"
+
+
+# Set environment variables for Maven
+ENV MAVEN_VERSION 3.8.3
+ENV MAVEN_HOME "C:\maven\apache-maven-${MAVEN_VERSION}"
+
+# Download and install Maven
+#https://dlcdn.apache.org/maven/maven-3/3.9.3/source/apache-maven-3.9.3-src.zip
+#https://downloads.apache.org/maven/maven-3/3.9.3/source/apache-maven-3.9.3-src.zip
+#https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/3.8.3/apache-maven-3.8.3-bin.zip
+ADD https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/${MAVEN_VERSION}/apache-maven-${MAVEN_VERSION}-bin.zip C:/maven.zip
+RUN powershell -Command "expand-archive -Path 'c:\maven.zip' -DestinationPath 'c:\maven'"
+RUN powershell -Command "Remove-Item -Path 'c:\maven.zip'"
+
+
+# Add Maven bin directory to the PATH
+RUN setx /M PATH "%PATH%;%MAVEN_HOME%\bin"
+
+
+# Set the working directory inside the container
+WORKDIR /files
+
+
+# Verify Java installation
+#RUN java -version
+
+#docker container run -it java:latest
+#docker container run -it e25:1 python ./run_tests_robustness.py
+
+
+

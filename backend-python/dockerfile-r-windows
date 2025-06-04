@@ -1,0 +1,23 @@
+# Use the Windows Server Core image as the base image
+FROM mcr.microsoft.com/windows/servercore:ltsc2019
+
+ENV R_VERSION 4.3.1
+# Download and install Microsoft R Open
+ADD https://cran.r-project.org/bin/windows/base/old/${R_VERSION}/R-${R_VERSION}-win.exe C:/R-win.exe
+
+# Install R silently
+RUN C:\R-win.exe /SILENT
+RUN powershell -Command "Remove-Item -Path 'c:\R-win.exe'"
+
+
+# Add R to the PATH
+RUN setx /M PATH "%PATH%;C:\Program Files\R\R-%R_VERSION%\bin\x64"
+
+# Set the working directory inside the container
+WORKDIR /files
+
+#docker container run -it b3b896b3d607
+#docker container run -it e25:1 python ./run_tests_robustness.py
+
+
+
